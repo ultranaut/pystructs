@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 """
-Implementation of a min-heap data structure.
+Min- and max-heap data structures.
 """
 
-class Heap:
-
+class MinHeap:
+    """
+    Binary min heap.
+    """
     def __init__(self, list_=None):
         self._heap = [None]
         self._size = 0
@@ -19,7 +21,7 @@ class Heap:
         self._size = len(self._heap) - 1
 
         index = int(self._size / 2)
-        while index >= 0:
+        while index > 0:
             self._sift_down(index)
             index -= 1
 
@@ -29,11 +31,11 @@ class Heap:
         """
         return self._size
 
-    def insert(self, val):
+    def insert(self, value):
         """
-        Insert an element into the heap.
+        Insert a new element into the heap.
         """
-        self._heap.append(val)
+        self._heap.append(value)
         self._size += 1
         self._sift_up(self._size)
 
@@ -59,9 +61,25 @@ class Heap:
 
     def increase_key(self, index, value):
         """
-        Increase the value of el's key to value
+        Increase the value of the key at a given index.
         """
+        if value < self._heap[index]:
+            # raise an exception?
+            pass
+
         self._heap[index] = value
+        self._sift_down(index)
+
+    def decrease_key(self, index, value):
+        """
+        Increase the value of the key at a given index.
+        """
+        if value > self._heap[index]:
+            # raise an exception?
+            pass
+
+        self._heap[index] = value
+        self._sift_up(index)
 
     def _sift_down(self, index):
         """
@@ -71,31 +89,88 @@ class Heap:
         is assumed that the two child subtrees are both valid heaps.
         """
         heap = self._heap
-        count = self._size
-        left = index*2
-        right = index*2 + 1
-        swap = index
 
-        if (left <= count and heap[left] <= heap[swap]):
-            swap = left
-        if (right <= count and heap[right] <= heap[swap]):
-            swap = right
-
+        swap = self._down_index(index)
         if swap is not index:
             heap[index], heap[swap] = heap[swap], heap[index]
             self._sift_down(swap)
 
     def _sift_up(self, index):
         """
-        Move index up the heap into a valid position.
+        Move the key at index up the heap into a valid position.
         """
-        parent = int(index/2)
+        parent = int(index / 2)
         heap = self._heap
-        if parent > 0 and heap[parent] > heap[index]:
+        if self._is_bad_child(index, parent):
             heap[parent], heap[index] = heap[index], heap[parent]
             self._sift_up(parent)
 
+    def _down_index(self, index):
+        """
+        Find the index of the smallest of the values among
+        a node and its children.
+        """
+        heap, size, swap = self._heap, self._size, index
+        left = index * 2
+        right = left + 1
 
+        if (left <= size and heap[left] <= heap[swap]):
+            swap = left
+        if (right <= size and heap[right] <= heap[swap]):
+            swap = right
+        return swap
+
+    def _is_bad_child(self, index, parent):
+        heap = self._heap
+        return parent > 0 and heap[parent] > heap[index]
+
+
+class MaxHeap(MinHeap):
+    """
+    Binary max heap.
+    """
+    # Same implementation as min heap, but with the increase/decrease
+    # key and _sift_up and _sift_down logics reversed
+    def increase_key(self, index, value):
+        """
+        Increase the value of the key at a given index.
+        """
+        if value < self._heap[index]:
+            # raise an exception?
+            pass
+
+        self._heap[index] = value
+        self._sift_up(index)
+
+    def decrease_key(self, index, value):
+        """
+        Increase the value of the key at a given index.
+        """
+        if value > self._heap[index]:
+            # raise an exception?
+            pass
+
+        self._heap[index] = value
+        self._sift_down(index)
+
+    def _down_index(self, index):
+        """
+        Find the index of the largest of the values among
+        a node and its children.
+        """
+        heap, size, swap = self._heap, self._size, index
+        left = index * 2
+        right = left + 1
+
+        if (left <= size and heap[left] >= heap[swap]):
+            swap = left
+        if (right <= size and heap[right] >= heap[swap]):
+            swap = right
+        return swap
+
+    def _is_bad_child(self, index, parent):
+        heap = self._heap
+        return parent > 0 and heap[parent] < heap[index]
 
 
 
